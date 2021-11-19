@@ -1,19 +1,24 @@
 package controllers.api
 
-import models.Todo
-import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, ControllerComponents}
+import javax.inject._
+import play.api.mvc._
+import play.api.libs.json._
+import models.{Todo, TodoForm}
+import play.api.data.FormError
 
-import javax.inject.{Inject, Singleton}
+import services.TodoService
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
-class TodoController @Inject()(cc : ControllerComponents) extends AbstractController(cc){
+class TodoController @Inject()(cc : ControllerComponents, todoService: TodoService) extends AbstractController(cc){
 
   implicit val todoFormat = Json.format[Todo]
 
-  def getAll = Action{
-    val todo = Todo(1, "item 1", false);
-    Ok(Json.toJson(todo))
+  def getAll() = Action.async { implicit request: Request[AnyContent] =>
+    todoService.listAllItems map { items =>
+      Ok(Json.toJson(items))
+    }
   }
 
 }
