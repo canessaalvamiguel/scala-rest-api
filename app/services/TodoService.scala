@@ -3,11 +3,13 @@ package services
 import com.google.inject.Inject
 import models.{Todo, TodoList}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class TodoService @Inject() (items: TodoList) {
 
-  def addItem(item: Todo): Future[String] = {
+  def addItem(item: Todo): Future[Try[String]] = {
     items.add(item)
   }
 

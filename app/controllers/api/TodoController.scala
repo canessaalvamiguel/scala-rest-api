@@ -5,15 +5,18 @@ import play.api.mvc._
 import play.api.libs.json._
 import models.{Todo, TodoForm}
 import play.api.data.FormError
-
 import services.TodoService
+import play.api.Logger
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 @Singleton
 class TodoController @Inject()(cc : ControllerComponents, todoService: TodoService) extends AbstractController(cc){
 
   implicit val todoFormat = Json.format[Todo]
+  val logger: Logger = Logger(this.getClass())
 
   def getAll() = Action.async { implicit request: Request[AnyContent] =>
     todoService.listAllItems map { items =>
@@ -32,11 +35,16 @@ class TodoController @Inject()(cc : ControllerComponents, todoService: TodoServi
       // if any error in submitted data
       errorForm => {
         errorForm.errors.foreach(println)
-        Future.successful(BadRequest("Error!"))
+        Future.successful(BadRequest("Error! Invalid data received"))
       },
       data => {
         val newTodoItem = Todo(0, data.name, data.isComplete)
-        todoService.addItem(newTodoItem).map( _ => Redirect(routes.TodoController.getAll))
+        todoService.addItem(newTodoItem).map {
+          case Success(value) => Ok(value)
+          case Failure(exception) =>
+            logger.error(s"Error occurs while saving data, error: ${exception}")
+            BadRequest(s"Something went wrong. Please try again later.")
+        }
       })
   }
 

@@ -8,6 +8,7 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import slick.jdbc.MySQLProfile.api._
+import scala.util.{Try, Failure, Success}
 
 case class Todo(id: Long, name: String, isComplete: Boolean)
 
@@ -40,14 +41,13 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
 
     var todoList = TableQuery[TodoTableDef]
 
-    def add(todoItem: Todo): Future[String] = {
+    def add(todoItem: Todo): Future[Try[String]] = {
       dbConfig.db
         .run(todoList += todoItem)
-        .map(res => "TodoItem successfully added")
+        .map(res => Success("TodoItem successfully added"))
         .recover {
           case ex: Exception => {
-            printf(ex.getMessage())
-            ex.getMessage
+            Failure(ex)
           }
         }
     }
