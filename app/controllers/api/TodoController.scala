@@ -42,7 +42,7 @@ class TodoController @Inject()(cc : ControllerComponents, todoService: TodoServi
         todoService.addItem(newTodoItem).map {
           case Success(value) => Ok(value)
           case Failure(exception) =>
-            logger.error(s"Error occurs while saving data, error: ${exception}")
+            logger.error(s"Error occurred while saving data, exception: ${exception}")
             BadRequest(s"Something went wrong. Please try again later.")
         }
       })
@@ -53,11 +53,16 @@ class TodoController @Inject()(cc : ControllerComponents, todoService: TodoServi
       // if any error in submitted data
       errorForm => {
         errorForm.errors.foreach(println)
-        Future.successful(BadRequest("Error!"))
+        Future.successful(BadRequest("Error! Invalid data received\""))
       },
       data => {
         val todoItem = Todo(id, data.name, data.isComplete)
-        todoService.updateItem(todoItem).map( _ => Redirect(routes.TodoController.getAll))
+        todoService.updateItem(todoItem).map{
+          case Success(value) => Ok(value)
+          case Failure(exception) =>
+            logger.error(s"Error occurred while updating data, exception: ${exception}")
+            BadRequest(s"Something went wrong. Please try again later.")
+        }
       })
   }
 

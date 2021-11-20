@@ -17,7 +17,7 @@ class TodoService @Inject() (items: TodoList) {
     items.delete(id)
   }
 
-  def updateItem(item: Todo): Future[Int] = {
+  def updateItem(item: Todo): Future[Try[String]] = {
     items.update(item)
   }
 

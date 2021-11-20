@@ -44,7 +44,7 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
     def add(todoItem: Todo): Future[Try[String]] = {
       dbConfig.db
         .run(todoList += todoItem)
-        .map(res => Success("TodoItem successfully added"))
+        .map(_ => Success("TodoItem successfully added"))
         .recover {
           case ex: Exception => {
             Failure(ex)
@@ -56,12 +56,23 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
       dbConfig.db.run(todoList.filter(_.id === id).delete)
     }
 
-    def update(todoItem: Todo): Future[Int] = {
+    def update(todoItem: Todo): Future[Try[String]] = {
       dbConfig.db
         .run(todoList.filter(_.id === todoItem.id)
           .map(x => (x.name, x.isComplete))
           .update(todoItem.name, todoItem.isComplete)
         )
+        .map{x =>
+          if(x > 0)
+            Success("TodoItem successfully updated")
+          else
+            Failure(new Exception(s"Item ${todoItem.id} doesn't exists"))
+        }
+        .recover {
+          case ex: Exception => {
+            Failure(ex)
+          }
+        }
     }
 
     def get(id: Long): Future[Option[Todo]] = {
