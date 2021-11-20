@@ -52,8 +52,18 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
         }
     }
 
-    def delete(id: Long): Future[Int] = {
+    def delete(id: Long): Future[Try[String]] = {
       dbConfig.db.run(todoList.filter(_.id === id).delete)
+        .map{x =>
+          if(x > 0)
+            Success("TodoItem successfully deleted")
+          else
+            Failure(new Exception(s"Item ${id} doesn't exists"))
+        }.recover {
+        case ex: Exception => {
+          Failure(ex)
+        }
+      }
     }
 
     def update(todoItem: Todo): Future[Try[String]] = {

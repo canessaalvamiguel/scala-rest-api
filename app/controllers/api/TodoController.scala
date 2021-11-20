@@ -67,8 +67,11 @@ class TodoController @Inject()(cc : ControllerComponents, todoService: TodoServi
   }
 
   def delete(id: Long) = Action.async { implicit request: Request[AnyContent] =>
-    todoService.deleteItem(id) map { res =>
-      Redirect(routes.TodoController.getAll)
+    todoService.deleteItem(id) map {
+      case Success(value) => Ok(value)
+      case Failure(exception) =>
+        logger.error(s"Error occurred while deleting data, exception: ${exception}")
+        BadRequest(s"Something went wrong. Please try again later.")
     }
   }
 }

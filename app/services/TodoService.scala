@@ -13,7 +13,7 @@ class TodoService @Inject() (items: TodoList) {
     items.add(item)
   }
 
-  def deleteItem(id: Long): Future[Int] = {
+  def deleteItem(id: Long): Future[Try[String]] = {
     items.delete(id)
   }
 
