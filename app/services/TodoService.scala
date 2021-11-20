@@ -26,6 +26,20 @@ class TodoService @Inject() (items: TodoList) {
   }
 
   def listAllItems: Future[Seq[Todo]] = {
+//      items.listAll.map(elements => elements.map(element => element.copy(name = element.name + " holis")))
+
+//    def alterName(elements: Seq[Todo]) : Seq[Todo] = {
+//      elements.map(element =>
+//        element.copy(name = element.name + " holis2")
+//      )
+//    }
+//    for{
+//      elements <- items.listAll
+//      result = alterName(elements)
+//    }yield{
+//      result
+//    }
+
     items.listAll
   }
 }
