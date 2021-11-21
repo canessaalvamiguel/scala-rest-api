@@ -34,7 +34,7 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
   override def * = (id, name, isComplete) <> (Todo.tupled, Todo.unapply)
 }
 
-  class TodoList @Inject()(
+  class TodoListModel @Inject()(
                             protected val dbConfigProvider: DatabaseConfigProvider
                           )(implicit executionContext: ExecutionContext)
     extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -89,7 +89,8 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
       dbConfig.db.run(todoList.filter(_.id === id).result.headOption)
     }
 
-    def listAll: Future[Seq[Todo]] = {
+    def listAll: Future[Option[Seq[Todo]]] = {
       dbConfig.db.run(todoList.result)
+        .map(Some(_))
     }
 }

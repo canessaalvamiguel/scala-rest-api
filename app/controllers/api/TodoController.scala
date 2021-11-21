@@ -4,9 +4,8 @@ import javax.inject._
 import play.api.mvc._
 import play.api.libs.json._
 import models.{Todo, TodoForm}
-import play.api.data.FormError
-import services.TodoService
 import play.api.Logger
+import services.TodoService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -25,8 +24,9 @@ class TodoController @Inject()(cc : ControllerComponents, todoService: TodoServi
   }
 
   def getById(id: Long) = Action.async { implicit request: Request[AnyContent] =>
-    todoService.getItem(id) map { item =>
-      Ok(Json.toJson(item))
+    todoService.getItem(id) map {
+      case Some(item) => Ok(Json.toJson(item))
+      case None => NotFound("Item not found")
     }
   }
 
