@@ -10,22 +10,24 @@ import org.scalatestplus.play.guice._
 import play.api.libs.json.Json
 import play.api.test._
 import play.api.test.Helpers._
-import slick.driver.MySQLDriver.api._
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.test.Helpers.baseApplicationBuilder.injector
+import slick.jdbc.JdbcProfile
+import slick.jdbc.MySQLProfile.api._
 
 class ApiRestControllerSpec() extends PlaySpec with GuiceOneAppPerTest with Injecting with BeforeAndAfterAll  {
 
   var idItem = 1L
 
   override def beforeAll(): Unit = {
-    val db = Database.forURL("jdbc:mysql://localhost:3306/scalatestdb?useSSL=false&user=root&password=root", driver="com.mysql.cj.jdbc.Driver")
-     db.run(
+    val dbConfig = injector.instanceOf[DatabaseConfigProvider].get[JdbcProfile]
+    //val db = Database.forURL("jdbc:mysql://localhost:3306/scalatestdb?useSSL=false&user=root&password=root", driver="com.mysql.cj.jdbc.Driver")
+    dbConfig.db.run(
       sql"""TRUNCATE TABLE todo""".as[(String, String)]
     )
     Thread.sleep(5000)
     super.beforeAll()
   }
-
-
 
   "ApiRest POST" should {
 
