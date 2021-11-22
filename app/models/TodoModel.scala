@@ -43,8 +43,8 @@ class TodoTableDef(tag: Tag) extends Table[Todo](tag, "todo") {
 
     def add(todoItem: Todo): Future[Try[String]] = {
       dbConfig.db
-        .run(todoList += todoItem)
-        .map(_ => Success("TodoItem successfully added"))
+        .run(todoList returning todoList.map(_.id) += todoItem)
+        .map(id => Success("TodoItem successfully added with id => "+id))
         .recover {
           case ex: Exception => {
             Failure(ex)
