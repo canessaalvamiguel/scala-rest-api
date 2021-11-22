@@ -7,7 +7,7 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 import scala.util.Try
 
-
+@Singleton
 class TodoManager @Inject() (items: TodoListModel) {
 
   def addItem(item: Todo): Future[Try[String]] = {

@@ -5,12 +5,8 @@ import actors.TodoStorageActor._
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import com.google.inject.Inject
-import models.{Todo, TodoListModel}
-import todo.AkkaMessages.InvalidMessageException
+import models.Todo
 import todo.TodoManager
-
-import javax.inject.Singleton
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.MINUTES
 import scala.util.Try
