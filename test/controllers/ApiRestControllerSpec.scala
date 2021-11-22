@@ -1,7 +1,6 @@
 package controllers
 
 import controllers.api.TodoController
-import models.{Todo, TodoTableDef}
 import org.scalatest.BeforeAndAfterAll
 
 import java.time.LocalDateTime
@@ -85,6 +84,23 @@ class ApiRestControllerSpec() extends PlaySpec with GuiceOneAppPerTest with Inje
       status(api) mustBe OK
       contentType(api) mustBe Some("text/plain")
       contentAsString(api) must include ("TodoItem successfully updated")
+    }
+  }
+
+  "ApiRest DELETE" should {
+
+    "delete item" in {
+      val currentTime: String = LocalDateTime.now().toString
+      val controller = inject[TodoController]
+      val api = controller
+        .delete(idItem)
+        .apply(
+          FakeRequest(PUT, "/api/todos/delete/"+idItem)
+        )
+
+      status(api) mustBe OK
+      contentType(api) mustBe Some("text/plain")
+      contentAsString(api) must include ("TodoItem successfully deleted")
     }
   }
 }
